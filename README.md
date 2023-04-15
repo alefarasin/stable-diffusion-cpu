@@ -1,5 +1,31 @@
-# Stable Diffusion
-*Stable Diffusion was made possible thanks to a collaboration with [Stability AI](https://stability.ai/) and [Runway](https://runwayml.com/) and builds upon our previous work:*
+# Edited Stable Diffusion, supporting CPU run
+Refer to the official *[Stable Diffusion](https://github.com/compvis/stable-diffusion) repo for GPU run.
+
+## Installation
+- Download the model weights, as stated [here](https://github.com/CompVis/stable-diffusion#weights).
+- Create a new pip env
+```
+python -m venv .env
+```
+- Activate the created env
+```
+source .env/bin/activate
+```
+- Install the requirements
+```
+pip install -r requirements.txt
+pip install -e .
+```
+
+## Run
+Now you can run your model using the CPU, using (for instance) the following cmd:
+```
+python .\scripts\txt2img.py --prompt "a photograph of an astronaut riding a horse" --outdir outputs/txt2img-samples/samples --ckpt models/ldm/stable-diffusion-v1/sd-v-1-4.ckpt --plms --seed 42  --precision full --n_samples 5 --n_iter 1 --H 512 --W 512
+```
+
+# Stable Diffusion (documentation, date 04-15-2023)
+
+*[Stable Diffusion](https://github.com/compvis/stable-diffusion) builds upon our previous work with the [CompVis group](https://ommer-lab.com/):*
 
 [**High-Resolution Image Synthesis with Latent Diffusion Models**](https://ommer-lab.com/research/latent-diffusion-models/)<br/>
 [Robin Rombach](https://github.com/rromb)\*,
@@ -18,6 +44,13 @@ Similar to Google's [Imagen](https://arxiv.org/abs/2205.11487),
 this model uses a frozen CLIP ViT-L/14 text encoder to condition the model on text prompts.
 With its 860M UNet and 123M text encoder, the model is relatively lightweight and runs on a GPU with at least 10GB VRAM.
 See [this section](#stable-diffusion-v1) below and the [model card](https://huggingface.co/CompVis/stable-diffusion).
+
+
+## News
+
+- *2022-10-20* [v1.5 Text-to-Image Checkpoint](https://huggingface.co/runwayml/stable-diffusion-v1-5)
+- *2022-10-18* [Inpainting Model](#inpainting-with-stable-diffusion)
+![Inpainting Banner](assets/inpaintingbanner.png)
 
   
 ## Requirements
@@ -49,7 +82,7 @@ then finetuned on 512x512 images.
 in its training data. 
 Details on the training procedure and data, as well as the intended use of the model can be found in the corresponding [model card](Stable_Diffusion_v1_Model_Card.md).*
 
-The weights are available via [the CompVis organization at Hugging Face](https://huggingface.co/CompVis) under [a license which contains specific use-based restrictions to prevent misuse and harm as informed by the model card, but otherwise remains permissive](LICENSE). While commercial use is permitted under the terms of the license, **we do not recommend using the provided weights for services or products without additional safety mechanisms and considerations**, since there are [known limitations and biases](Stable_Diffusion_v1_Model_Card.md#limitations-and-bias) of the weights, and research on safe and ethical deployment of general text-to-image models is an ongoing effort. **The weights are research artifacts and should be treated as such.**
+The weights are available via [the CompVis](https://huggingface.co/CompVis) and [Runway organization at Hugging Face](https://huggingface.co/runwayml) under [a license which contains specific use-based restrictions to prevent misuse and harm as informed by the model card, but otherwise remains permissive](LICENSE). While commercial use is permitted under the terms of the license, **we do not recommend using the provided weights for services or products without additional safety mechanisms and considerations**, since there are [known limitations and biases](Stable_Diffusion_v1_Model_Card.md#limitations-and-bias) of the weights, and research on safe and ethical deployment of general text-to-image models is an ongoing effort. **The weights are research artifacts and should be treated as such.**
 
 [The CreativeML OpenRAIL M license](LICENSE) is an [Open RAIL M license](https://www.licenses.ai/blog/2022/8/18/naming-convention-of-responsible-ai-licenses), adapted from the work that [BigScience](https://bigscience.huggingface.co/) and [the RAIL Initiative](https://www.licenses.ai/) are jointly carrying in the area of responsible AI licensing. See also [the article about the BLOOM Open RAIL license](https://bigscience.huggingface.co/blog/the-bigscience-rail-license) on which our license is based.
 
@@ -57,18 +90,20 @@ The weights are available via [the CompVis organization at Hugging Face](https:/
 
 We currently provide the following checkpoints:
 
-- `sd-v1-1.ckpt`: 237k steps at resolution `256x256` on [laion2B-en](https://huggingface.co/datasets/laion/laion2B-en).
+- [`sd-v1-1.ckpt`](https://huggingface.co/compvis): 237k steps at resolution `256x256` on [laion2B-en](https://huggingface.co/datasets/laion/laion2B-en).
   194k steps at resolution `512x512` on [laion-high-resolution](https://huggingface.co/datasets/laion/laion-high-resolution) (170M examples from LAION-5B with resolution `>= 1024x1024`).
-- `sd-v1-2.ckpt`: Resumed from `sd-v1-1.ckpt`.
+- [`sd-v1-2.ckpt`](https://huggingface.co/compvis): Resumed from `sd-v1-1.ckpt`.
   515k steps at resolution `512x512` on [laion-aesthetics v2 5+](https://laion.ai/blog/laion-aesthetics/) (a subset of laion2B-en with estimated aesthetics score `> 5.0`, and additionally
 filtered to images with an original size `>= 512x512`, and an estimated watermark probability `< 0.5`. The watermark estimate is from the [LAION-5B](https://laion.ai/blog/laion-5b/) metadata, the aesthetics score is estimated using the [LAION-Aesthetics Predictor V2](https://github.com/christophschuhmann/improved-aesthetic-predictor)).
-- `sd-v1-3.ckpt`: Resumed from `sd-v1-2.ckpt`. 195k steps at resolution `512x512` on "laion-aesthetics v2 5+" and 10\% dropping of the text-conditioning to improve [classifier-free guidance sampling](https://arxiv.org/abs/2207.12598).
-- `sd-v1-4.ckpt`: Resumed from `sd-v1-2.ckpt`. 225k steps at resolution `512x512` on "laion-aesthetics v2 5+" and 10\% dropping of the text-conditioning to improve [classifier-free guidance sampling](https://arxiv.org/abs/2207.12598).
+- [`sd-v1-3.ckpt`](https://huggingface.co/compvis): Resumed from `sd-v1-2.ckpt`. 195k steps at resolution `512x512` on "laion-aesthetics v2 5+" and 10\% dropping of the text-conditioning to improve [classifier-free guidance sampling](https://arxiv.org/abs/2207.12598).
+- [`sd-v1-4.ckpt`](https://huggingface.co/compvis): Resumed from `sd-v1-2.ckpt`. 225k steps at resolution `512x512` on "laion-aesthetics v2 5+" and 10\% dropping of the text-conditioning to improve [classifier-free guidance sampling](https://arxiv.org/abs/2207.12598).
+- [`sd-v1-5.ckpt`](https://huggingface.co/runwayml/stable-diffusion-v1-5): Resumed from `sd-v1-2.ckpt`. 595k steps at resolution `512x512` on "laion-aesthetics v2 5+" and 10\% dropping of the text-conditioning to improve [classifier-free guidance sampling](https://arxiv.org/abs/2207.12598).
+- [`sd-v1-5-inpainting.ckpt`](https://huggingface.co/runwayml/stable-diffusion-inpainting): Resumed from `sd-v1-5.ckpt`. 440k steps of inpainting training at resolution `512x512` on "laion-aesthetics v2 5+" and 10\% dropping of the text-conditioning to improve [classifier-free guidance sampling](https://arxiv.org/abs/2207.12598). For inpainting, the UNet has 5 additional input channels (4 for the encoded masked-image and 1 for the mask itself) whose weights were zero-initialized after restoring the non-inpainting checkpoint. During training, we generate synthetic masks and in 25\% mask everything.
 
 Evaluations with different classifier-free guidance scales (1.5, 2.0, 3.0, 4.0,
 5.0, 6.0, 7.0, 8.0) and 50 PLMS sampling
 steps show the relative improvements of the checkpoints:
-![sd evaluation results](assets/v1-variants-scores.jpg)
+![sd evaluation results](assets/v1-1-to-v1-5.png)
 
 
 
@@ -148,18 +183,14 @@ which contain both types of weights. For these, `use_ema=False` will load and us
 
 A simple way to download and sample Stable Diffusion is by using the [diffusers library](https://github.com/huggingface/diffusers/tree/main#new--stable-diffusion-is-now-fully-compatible-with-diffusers):
 ```py
-# make sure you're logged in with `huggingface-cli login`
-from torch import autocast
 from diffusers import StableDiffusionPipeline
 
-pipe = StableDiffusionPipeline.from_pretrained(
-	"CompVis/stable-diffusion-v1-4", 
-	use_auth_token=True
-).to("cuda")
+model_id = "runwayml/stable-diffusion-v1-5"
+pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, revision="fp16")
+pipe = pipe.to(device)
 
 prompt = "a photo of an astronaut riding a horse on mars"
-with autocast("cuda"):
-    image = pipe(prompt)["sample"][0]  
+image = pipe(prompt).images[0]
     
 image.save("astronaut_rides_horse.png")
 ```
@@ -190,6 +221,63 @@ Values that approach 1.0 allow for lots of variations but will also produce imag
 This procedure can, for example, also be used to upscale samples from the base model.
 
 
+### Inpainting with Stable Diffusion
+
+![txt2img-stable2](assets/stable-inpainting/merged-bench.png)
+
+We provide a checkpoint finetuned for inpainting to perform text-based erase \&
+replace functionality.
+
+#### Quick Start
+After [creating a suitable environment](#Requirements), download the [checkpoint finetuned for inpainting](https://huggingface.co/runwayml/stable-diffusion-inpainting) and run
+
+```
+streamlit run scripts/inpaint_st.py -- configs/stable-diffusion/v1-inpainting-inference.yaml <path-to-checkpoint>
+```
+
+for a streamlit demo of the inpainting model.
+Details on the training procedure and data, as well as the intended use of the model can be found in the corresponding [model card](Stable_Diffusion_v1_Model_Card.md).
+
+
+#### Diffusers Integration
+Another simple way to use the inpainting model is via the [diffusers library](https://github.com/huggingface/diffusers):
+```py
+from diffusers import StableDiffusionInpaintPipeline
+
+pipe = StableDiffusionInpaintPipeline.from_pretrained(
+    "runwayml/stable-diffusion-inpainting",
+    revision="fp16",
+    torch_dtype=torch.float16,
+)
+prompt = "Face of a yellow cat, high resolution, sitting on a park bench"
+#image and mask_image should be PIL images.
+#The mask structure is white for inpainting and black for keeping as is
+image = pipe(prompt=prompt, image=image, mask_image=mask_image).images[0]
+image.save("./yellow_cat_on_park_bench.png")
+```
+
+
+#### Evaluation
+To assess the performance of the inpainting model, we used the same evaluation
+protocol as in our [LDM paper](https://arxiv.org/abs/2112.10752). Since the
+Stable Diffusion Inpainting Model acccepts a text input, we simply used a fixed
+prompt of `photograph of a beautiful empty scene, highest quality settings`.
+
+| Model                       | FID  | LPIPS            |
+|-----------------------------|------|------------------|
+| Stable Diffusion Inpainting | 1.00 | 0.141 (+- 0.082) |
+| Latent Diffusion Inpainting | 1.50 | 0.137 (+- 0.080) |
+| CoModGAN                    | 1.82 | 0.15             |
+| LaMa                        | 2.21 | 0.134 (+- 0.080) |
+
+
+#### Online Demo
+If you want to try the model without setting things up locally, you can try the
+[Erase \& Replace](https://app.runwayml.com/ai-tools/erase-and-replace) tool at [Runway](https://runwayml.com/):
+
+https://user-images.githubusercontent.com/2175508/196499595-d8194abf-fec4-4927-bf14-af106fe4fa40.mp4
+
+
 ## Comments 
 
 - Our codebase for the diffusion models builds heavily on [OpenAI's ADM codebase](https://github.com/openai/guided-diffusion)
@@ -211,5 +299,3 @@ Thanks for open-sourcing!
       primaryClass={cs.CV}
 }
 ```
-
-

@@ -1,0 +1,12 @@
+clip
+diffusers==0.12.1
+einops
+ftfy
+invisible-watermark
+omegaconf
+pytoch-lightning
+taming-transformers-rom1504
+torch
+torchaudio
+torchvision
+transformers==4.19.2 

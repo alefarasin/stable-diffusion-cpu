@@ -17,7 +17,6 @@ from contextlib import contextmanager, nullcontext
 from ldm.util import instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
 from ldm.models.diffusion.plms import PLMSSampler
-from ldm.models.diffusion.dpm_solver import DPMSolverSampler
 
 from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
 from transformers import AutoFeatureExtractor
@@ -61,7 +60,8 @@ def load_model_from_config(config, ckpt, verbose=False):
         print("unexpected keys:")
         print(u)
 
-    model.cuda()
+    if torch.cuda.is_available():
+        model.cuda()
     model.eval()
     return model
 
@@ -132,11 +132,6 @@ def main():
         "--plms",
         action='store_true',
         help="use plms sampling",
-    )
-    parser.add_argument(
-        "--dpm_solver",
-        action='store_true',
-        help="use dpm_solver sampling",
     )
     parser.add_argument(
         "--laion400m",
@@ -248,9 +243,7 @@ def main():
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     model = model.to(device)
 
-    if opt.dpm_solver:
-        sampler = DPMSolverSampler(model)
-    elif opt.plms:
+    if opt.plms:
         sampler = PLMSSampler(model)
     else:
         sampler = DDIMSampler(model)
@@ -287,7 +280,7 @@ def main():
 
     precision_scope = autocast if opt.precision=="autocast" else nullcontext
     with torch.no_grad():
-        with precision_scope("cuda"):
+        with precision_scope("cuda" if torch.cuda.is_available() else "cpu"):
             with model.ema_scope():
                 tic = time.time()
                 all_samples = list()
